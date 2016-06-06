@@ -7,29 +7,35 @@
 use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
 
-$this->title = 'Signup';
+$this->title = Yii::t('common','signup');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="site-signup">
-    <h1><?= Html::encode($this->title) ?></h1>
-
-    <p>Please fill out the following fields to signup:</p>
-
     <div class="row">
-        <div class="col-lg-5">
+        <div class="col-lg-4"></div>
+        <div class="col-lg-4 ">
             <?php $form = ActiveForm::begin(['id' => 'form-signup']); ?>
 
-                <?= $form->field($model, 'username')->textInput(['autofocus' => true]) ?>
+                <?= $form->field($model, 'username',[
+                  'template' => "<div class=\"input-group\">
+                        <span class=\"input-group-addon\"><i class=\"icon iconfont\">&#xe601;</i>注册帐号</span>{input}
+                 </div>"
+                ])->textInput(['autofocus' => true]) ?>
 
-                <?= $form->field($model, 'email') ?>
+                <?= $form->field($model, 'email',[
+                    'template' => "<div class=\"input-group\">
+                        <span class=\"input-group-addon\"><i class=\"icon iconfont\">&#xe602;</i>注册邮箱</span>{input}</div>"
+                ]) ?>
 
-                <?= $form->field($model, 'password')->passwordInput() ?>
+                <?= $form->field($model, 'password',[
+                    'template' => "<div class=\"input-group\">
+                        <span class=\"input-group-addon\"><i class=\"icon iconfont\">&#xe600;</i>注册密码
+</span>{input}</div>"])->passwordInput() ?>
 
                 <div class="form-group">
-                    <?= Html::submitButton('Signup', ['class' => 'btn btn-primary', 'name' => 'signup-button']) ?>
+                    <?= Html::submitButton(Yii::t('common','signup'), ['class' => 'btn btn-success btn-block', 'name' => 'signup-button']) ?>
                 </div>
 
             <?php ActiveForm::end(); ?>
         </div>
+        <div class="col-lg-4"></div>
     </div>
-</div>

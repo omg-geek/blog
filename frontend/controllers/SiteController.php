@@ -12,6 +12,7 @@ use frontend\models\PasswordResetRequestForm;
 use frontend\models\ResetPasswordForm;
 use frontend\models\SignupForm;
 use frontend\models\ContactForm;
+use yii\captcha\Captcha;
 
 /**
  * Site controller
@@ -82,6 +83,7 @@ class SiteController extends Controller
      */
     public function actionLogin()
     {
+        $this->layout = 'login.php';
         if (!Yii::$app->user->isGuest) {
             return $this->goHome();
         }
@@ -109,7 +111,7 @@ class SiteController extends Controller
     }
 
     /**
-     * Displays contact page.
+     * Displays 联系页面
      *
      * @return mixed
      */
@@ -148,6 +150,7 @@ class SiteController extends Controller
      */
     public function actionSignup()
     {
+        $this->layout = 'login.php';
         $model = new SignupForm();
         if ($model->load(Yii::$app->request->post())) {
             if ($user = $model->signup()) {

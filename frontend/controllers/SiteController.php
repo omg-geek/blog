@@ -12,7 +12,8 @@ use frontend\models\PasswordResetRequestForm;
 use frontend\models\ResetPasswordForm;
 use frontend\models\SignupForm;
 use frontend\models\ContactForm;
-use yii\captcha\Captcha;
+use frontend\models\Eken;
+use common\models\User;
 
 /**
  * Site controller
@@ -62,6 +63,10 @@ class SiteController extends Controller
             'captcha' => [
                 'class' => 'yii\captcha\CaptchaAction',
                 'fixedVerifyCode' => YII_ENV_TEST ? 'testme' : null,
+                'height' => 35,
+                'width' => 65,
+                'minLength' => 5,
+                'maxLength' => 5,
             ],
         ];
     }
@@ -83,11 +88,11 @@ class SiteController extends Controller
      */
     public function actionLogin()
     {
-        $this->layout = 'login.php';
+        $this->layout = 'login.php';        //调用自定义的login默认模板
+
         if (!Yii::$app->user->isGuest) {
             return $this->goHome();
         }
-
         $model = new LoginForm();
         if ($model->load(Yii::$app->request->post()) && $model->login()) {
             return $this->goBack();
@@ -97,6 +102,7 @@ class SiteController extends Controller
             ]);
         }
     }
+
 
     /**
      * Logs out the current user.
@@ -120,9 +126,9 @@ class SiteController extends Controller
         $model = new ContactForm();
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
             if ($model->sendEmail(Yii::$app->params['adminEmail'])) {
-                Yii::$app->session->setFlash('success', 'Thank you for contacting us. We will respond to you as soon as possible.');
+                Yii::$app->session->setFlash('success', Yii::t('common','Thank you for contacting us. We will respond to you as soon as possible.'));
             } else {
-                Yii::$app->session->setFlash('error', 'There was an error sending email.');
+                Yii::$app->session->setFlash('error', Yii::t('common','There was an error sending email.'));
             }
 
             return $this->refresh();
@@ -148,18 +154,50 @@ class SiteController extends Controller
      *
      * @return mixed
      */
-    public function actionSignup()
+
+    public function actionSignup($token =null,$email=null)
     {
+        //调用自定义的默认模板
         $this->layout = 'login.php';
+
         $model = new SignupForm();
+        //邮件激活
+        if (!is_null($token)){
+           if (!is_null($email)){
+                $user = new User();
+                $utoken = $user->find()->where(['token'=>$token,'email'=>$email])->one();
+                if($utoken){
+                    $utoken->status = 10;
+                    if($utoken->save()){
+                        if (Yii::$app->getUser()->login($utoken)) {
+                            Yii::$app->session->setFlash('success', Yii::t('common','Activate success！'));
+                            return $this->goHome();
+                        }
+                    }
+                }
+            }
+       }
+
+        //是否提交
         if ($model->load(Yii::$app->request->post())) {
+            $model->token = md5(str_shuffle(Yii::$app->request->post()['_csrf']) . mt_rand(100, 999));
             if ($user = $model->signup()) {
-                if (Yii::$app->getUser()->login($user)) {
-                    return $this->goHome();
+                //邮件发送
+                $mail = \Yii::$app->mailer->compose()
+                    ->setFrom(['hackbooks@163.com' => Yii::t('common','emailform')])
+                    ->setTo($model->email)
+                    ->setSubject(Yii::t('common','emailsubject'))
+                    ->setHtmlBody(
+                        Yii::t('common','emailbody')."<br>" . Yii::$app->params['frontUrl'] . "/site/signup.html?token=" . $model->token . '&email=' . $model->email)
+                    ->send();
+                if ($mail) {
+                    Yii::$app->session->setFlash('success', Yii::t('common','Check your email for further instructions. '));
+                    return $this->refresh();
+                } else {
+                    Yii::$app->session->setFlash('error', Yii::t('common','There was an error sending email.'));
                 }
             }
         }
-
         return $this->render('signup', [
             'model' => $model,
         ]);

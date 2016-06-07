@@ -30,6 +30,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     'template' => "<div class=\"input-group\">
                         <span class=\"input-group-addon\"><i class=\"icon iconfont\">&#xe600;</i>注册密码
 </span>{input}</div>"])->passwordInput() ?>
+            
 
                 <div class="form-group">
                     <?= Html::submitButton(Yii::t('common','signup'), ['class' => 'btn btn-success btn-block', 'name' => 'signup-button']) ?>

@@ -12,7 +12,7 @@ class SignupForm extends Model
     public $username;
     public $email;
     public $password;
-
+    public $token;
     public $repassword;
     public $verifyCode;
 
@@ -34,11 +34,8 @@ class SignupForm extends Model
             ['email', 'string', 'max' => 255],
             ['email', 'unique', 'targetClass' => '\common\models\User', 'message' => 'This email address has already been taken.'],
 
-            [['password','repassword'], 'required'],
-            [['password','repassword'], 'string', 'min' => 6],
-            ['repassword', 'compare', 'compareAttribute' => 'password','message'=>'两次输入的密码不一致！'],
-
-            ['verifyCode','captcha'],
+            ['password', 'required'],
+            ['password', 'string', 'min' => 6],
         ];
     }
     /**
@@ -54,10 +51,13 @@ class SignupForm extends Model
         
         $user = new User();
         $user->username = $this->username;
-        $user->email = $this->email;
+        $user->email  = $this->email;
+        $user->token  = $this->token;
+        $user->status = 0;                  //这里改为0,是为了配合邮箱注册，默认值为0的时候，注册后也登录不了
         $user->setPassword($this->password);
         $user->generateAuthKey();
         
         return $user->save() ? $user : null;
     }
+    
 }

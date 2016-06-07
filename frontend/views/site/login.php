@@ -27,7 +27,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 ])->passwordInput() ?>
 
                 <?= $form->field($model, 'verifyCode')->widget(Captcha::className(), [
-                'template' => '<div class="row"><div class="col-lg-3">{image}</div><div class="col-lg-9">{input}</div></div>',
+                'template' => '<div class="row"><div class="col-lg-9">{input}</div><div class="col-lg-3">{image}</div></div>',
             ]) ?>
 
             <div class="form-group">
@@ -35,8 +35,9 @@ $this->params['breadcrumbs'][] = $this->title;
             </div>
 
             <div>
-                <?= $form->field($model, 'rememberMe')->checkbox() ?>
+                <span><?= $form->field($model, 'rememberMe')->checkbox() ?>
                 <?= Yii::t('common','forget password ?') . Html::a(Yii::t('common','reset it'), ['site/request-password-reset']) ?>.
+                </span>
             </div>
 
 
